@@ -1,6 +1,6 @@
 <?php
 /**
- * check-standalone.php — Prüft die Eigenständigkeit dieses Moduls (Katasteramt, vormals StrukturHub).
+ * check-standalone.php — Prüft die Eigenständigkeit dieses Moduls (Raumstruktur, vormals Katasteramt/StrukturHub).
  *
  * Grundregel des Modul-Verbunds: Kein Modul darf ein anderes voraussetzen.
  * Jeder Aufruf einer fremden Modulfunktion (MHUB_*, PVF_*, HEISHA_* ...) muss
@@ -23,7 +23,7 @@
  */
 
 // Präfixe der Partnermodule im Verbund. Neue Partner hier ergänzen.
-// STRUKT ist der EIGENE Präfix dieses Repos und gehört daher NICHT in die
+// RAUM ist der EIGENE Präfix dieses Repos und gehört daher NICHT in die
 // Liste — sonst meldet das Skript die eigenen Funktionen als ungeschützte
 // Fremdaufrufe.
 const FOREIGN_PREFIXES = ['IHUB', 'IHUBD', 'IHUBNRG', 'IHUBMON', 'IHUBTILE', 'MHUB', 'MHUBV', 'CHUB', 'MIGHUB', 'PVF', 'LFC', 'HEISHA', 'WPHUB', 'SGW', 'SBH', 'TIBBERGR', 'TESSIE', 'EMS', 'NRGDASH', 'MODBUS', 'GWET'];

@@ -3,42 +3,46 @@
     {
       "type": "ExpansionPanel",
       "name": "NewsPanel",
-      "caption": "🆕 Neu in Version 0.4.2",
+      "caption": "🆕 Neu in Version 0.5.0",
       "expanded": true,
       "visible": true,
       "items": [
         {
           "type": "Label",
-          "caption": "Baumeister bei Räumen: neue Nummer-Option „Geschoss.Raum“ — erzeugt aus der zugeordneten Etage automatisch „1.01“ bis „1.20“ (Präfix optional, Ziffernbreite passt sich dem Bereich an)."
+          "caption": "Umbenannt: aus „Katasteramt“ wird „Raumstruktur“. Der Vertrag heißt jetzt RAUM_GetStructure (Rückgabeformat unverändert, vormals STRUKT_GetStructure). Die Bereiche heißen „Struktur anlegen“ und „Namensprüfung“. Bitte Skripte, die STRUKT_ aufrufen, auf RAUM_ umstellen."
         },
         {
           "type": "Label",
-          "caption": "Erkennt jetzt auch zusammengesetzte Geschoss.Raum-Nummern („1.11 Büro“ = Geschoss 1, Raum 11) — verbreitet bei öffentlichen Gebäuden/Institutionen. Wirkt sich auf das number-Feld im Vertrag und die Standesamt-Zahlenpositionsprüfung aus."
+          "caption": "Struktur anlegen bei Räumen: neue Nummer-Option „Geschoss.Raum“ — erzeugt aus der zugeordneten Etage automatisch „1.01“ bis „1.20“ (Präfix optional, Ziffernbreite passt sich dem Bereich an)."
         },
         {
           "type": "Label",
-          "caption": "Baumeister: neue Option „vorne mit Punkt“ bei „Nummer“ (z. B. „1. Obergeschoss“) zusätzlich zu „hinten“/„vorne“ — gilt für Etagen und Räume gleichermaßen."
+          "caption": "Erkennt jetzt auch zusammengesetzte Geschoss.Raum-Nummern („1.11 Büro“ = Geschoss 1, Raum 11) — verbreitet bei öffentlichen Gebäuden/Institutionen. Wirkt sich auf das number-Feld im Vertrag und die Zahlenpositionsprüfung der Namensprüfung aus."
         },
         {
           "type": "Label",
-          "caption": "Fehlerbehebung: Baumeister-Massen-Hilfe („➕ Einfügen“) und Standesamt-Übernehmen-Button warfen einen Fatal Error (\"Argument must be of type string, IPSList given\"). Betraf nur den Formular-Button-Aufruf, nicht STRUKT_GetStructure()."
+          "caption": "Struktur anlegen: neue Option „vorne mit Punkt“ bei „Nummer“ (z. B. „1. Obergeschoss“) zusätzlich zu „hinten“/„vorne“ — gilt für Etagen und Räume gleichermaßen."
         },
         {
           "type": "Label",
-          "caption": "Seit 0.4.0: das Standesamt (Panel „🏛️ Standesamt“) — prüft Etagen-/Raumnamen auf Konsistenz (Zahlenposition, Groß-/Kleinschreibung, Duplikate, kryptische Namen) und bietet für die auffälligen Zeilen eine Korrektur an. Rein beschreibend: die Mehrheit deiner eigenen Namen bestimmt die Konvention, nichts wird vorgegeben. Nichts geschieht automatisch — nur angehakte Zeilen werden umbenannt."
+          "caption": "Fehlerbehebung: Massen-Hilfe von „Struktur anlegen“ („➕ Einfügen“) und Übernehmen-Button der Namensprüfung warfen einen Fatal Error (\"Argument must be of type string, IPSList given\"). Betraf nur den Formular-Button-Aufruf, nicht RAUM_GetStructure()."
         },
         {
           "type": "Label",
-          "caption": "Seit 0.2.0: der Baumeister (Panel „🏗️ Baumeister“) — legt Etagen-/Raum-Kategorien nach der Verbund-Konvention an, auch in Masse per Präfix+Nummernbereich (privat wie gewerblich)."
+          "caption": "Seit 0.4.0: die Namensprüfung (Panel „🏛️ Namensprüfung“) — prüft Etagen-/Raumnamen auf Konsistenz (Zahlenposition, Groß-/Kleinschreibung, Duplikate, kryptische Namen) und bietet für die auffälligen Zeilen eine Korrektur an. Rein beschreibend: die Mehrheit deiner eigenen Namen bestimmt die Konvention, nichts wird vorgegeben. Nichts geschieht automatisch — nur angehakte Zeilen werden umbenannt."
         },
         {
           "type": "Label",
-          "caption": "Seit 0.1.0: liest die bestehende Objektbaum-Struktur (Etagen/Räume/Geräte-Instanzen) ein und stellt sie anderen NRG-Stack-Modulen als Vertrag (STRUKT_GetStructure) bereit."
+          "caption": "Seit 0.2.0: das Anlegen der Struktur (Panel „🏗️ Struktur anlegen“) — legt Etagen-/Raum-Kategorien nach der Verbund-Konvention an, auch in Masse per Präfix+Nummernbereich (privat wie gewerblich)."
+        },
+        {
+          "type": "Label",
+          "caption": "Seit 0.1.0: liest die bestehende Objektbaum-Struktur (Etagen/Räume/Geräte-Instanzen) ein und stellt sie anderen anderen Modulen als Vertrag (RAUM_GetStructure) bereit."
         },
         {
           "type": "Button",
           "caption": "Verstanden – nicht mehr anzeigen",
-          "onClick": "STRUKT_AckNews($id);"
+          "onClick": "RAUM_AckNews($id);"
         }
       ]
     },
@@ -49,7 +53,7 @@
       "items": [
         {
           "type": "Label",
-          "caption": "Katasteramt macht die bestehende Objektbaum-Struktur einer Symcon-Installation maschinenlesbar. Unten die Wurzelkategorie deiner Räume auswählen (z. B. eine Kategorie „Räume“ oder „Zuhause“) — Beispiel, keine Vorgabe."
+          "caption": "Raumstruktur macht die bestehende Objektbaum-Struktur einer Symcon-Installation maschinenlesbar. Unten die Wurzelkategorie deiner Räume auswählen (z. B. eine Kategorie „Räume“ oder „Zuhause“) — Beispiel, keine Vorgabe."
         },
         {
           "type": "Label",
@@ -61,15 +65,15 @@
         },
         {
           "type": "Label",
-          "caption": "Vertrag für andere Module: STRUKT_GetStructure($id) liefert einen JSON-STRING (kein PHP-Array!) mit contractVersion/levels/rooms. Immer hinter function_exists('STRUKT_GetStructure') aufrufen."
+          "caption": "Vertrag für andere Module: RAUM_GetStructure($id) liefert einen JSON-STRING (kein PHP-Array!) mit contractVersion/levels/rooms. Immer hinter function_exists('RAUM_GetStructure') aufrufen."
         },
         {
           "type": "Label",
-          "caption": "Baumeister (Panel weiter unten): Zeilen in „Etagen“/„Räume“ eintragen (frei benennbar — egal ob Etage/Stockwerk/Geschoss, Raum/Büro/Zimmer), bei Bedarf über Präfix+Nummernbereich viele Zeilen auf einmal einfügen. „Vorschau“ zeigt, was passieren würde, ohne etwas anzulegen. „Jetzt anlegen“ erzeugt die Kategorien wirklich — mehrfaches Anlegen mit denselben Zeilen legt nichts doppelt an. Legt KEINE Geräte-Verknüpfungen an, nur das Kategorie-Gerüst."
+          "caption": "Struktur anlegen (Panel weiter unten): Zeilen in „Etagen“/„Räume“ eintragen (frei benennbar — egal ob Etage/Stockwerk/Geschoss, Raum/Büro/Zimmer), bei Bedarf über Präfix+Nummernbereich viele Zeilen auf einmal einfügen. „Vorschau“ zeigt, was passieren würde, ohne etwas anzulegen. „Jetzt anlegen“ erzeugt die Kategorien wirklich — mehrfaches Anlegen mit denselben Zeilen legt nichts doppelt an. Legt KEINE Geräte-Verknüpfungen an, nur das Kategorie-Gerüst."
         },
         {
           "type": "Label",
-          "caption": "Standesamt (Panel weiter unten): „Struktur prüfen“ zeigt Auffälligkeiten bei Namen (Zahlenposition, Groß-/Kleinschreibung, Duplikate, kryptische Namen) — rein beschreibend anhand deiner eigenen Mehrheit, keine feste Vorgabe. Nur Zeilen mit Häkchen bei „Anwenden“ werden durch „Ausgewählte übernehmen“ tatsächlich umbenannt."
+          "caption": "Namensprüfung (Panel weiter unten): „Struktur prüfen“ zeigt Auffälligkeiten bei Namen (Zahlenposition, Groß-/Kleinschreibung, Duplikate, kryptische Namen) — rein beschreibend anhand deiner eigenen Mehrheit, keine feste Vorgabe. Nur Zeilen mit Häkchen bei „Anwenden“ werden durch „Ausgewählte übernehmen“ tatsächlich umbenannt."
         }
       ]
     },
@@ -118,7 +122,7 @@
     {
       "type": "Button",
       "caption": "🔎 Struktur jetzt einlesen",
-      "onClick": "echo STRUKT_RefreshStructure($id);"
+      "onClick": "echo RAUM_RefreshStructure($id);"
     },
     {
       "type": "Label",
@@ -151,7 +155,7 @@
     },
     {
       "type": "ExpansionPanel",
-      "caption": "🏗️ Baumeister",
+      "caption": "🏗️ Struktur anlegen",
       "expanded": false,
       "items": [
         {
@@ -190,7 +194,7 @@
                 { "caption": "vorne mit Punkt (1. Etage)", "value": "vorne_punkt" }
               ]
             },
-            { "type": "Button", "caption": "➕ Einfügen", "onClick": "echo STRUKT_AddLevelRows($id, $GenLevels, $GenLevelPrefix, $GenLevelStart, $GenLevelEnd, $GenLevelNumberPos);" }
+            { "type": "Button", "caption": "➕ Einfügen", "onClick": "echo RAUM_AddLevelRows($id, $GenLevels, $GenLevelPrefix, $GenLevelStart, $GenLevelEnd, $GenLevelNumberPos);" }
           ]
         },
         {
@@ -228,10 +232,10 @@
               ]
             },
             { "type": "ValidationTextBox", "name": "GenRoomLevel", "caption": "für Etage (leer = keine)" },
-            { "type": "Button", "caption": "➕ Einfügen", "onClick": "echo STRUKT_AddRoomRows($id, $GenRooms, $GenRoomPrefix, $GenRoomStart, $GenRoomEnd, $GenRoomLevel, $GenRoomNumberPos);" }
+            { "type": "Button", "caption": "➕ Einfügen", "onClick": "echo RAUM_AddRoomRows($id, $GenRooms, $GenRoomPrefix, $GenRoomStart, $GenRoomEnd, $GenRoomLevel, $GenRoomNumberPos);" }
           ]
         },
-        { "type": "Button", "caption": "🔍 Vorschau", "onClick": "echo STRUKT_PreviewSkeleton($id, $GenLevels, $GenRooms);" },
+        { "type": "Button", "caption": "🔍 Vorschau", "onClick": "echo RAUM_PreviewSkeleton($id, $GenLevels, $GenRooms);" },
         {
           "type": "List",
           "name": "GenPreview",
@@ -251,22 +255,22 @@
           "type": "Button",
           "caption": "🏗️ Jetzt anlegen",
           "confirm": "Legt die oben gelistete Struktur wirklich in deinem Objektbaum an. Fortfahren?",
-          "onClick": "echo STRUKT_BuildSkeleton($id, $GenConfirmed, $GenLevels, $GenRooms);"
+          "onClick": "echo RAUM_BuildSkeleton($id, $GenConfirmed, $GenLevels, $GenRooms);"
         },
         { "type": "Label", "name": "GenStatusLine", "caption": "ℹ️ Noch nichts angelegt." }
       ]
     },
     {
       "type": "ExpansionPanel",
-      "caption": "🏛️ Standesamt",
+      "caption": "🏛️ Namensprüfung",
       "expanded": false,
       "items": [
         {
           "type": "Label",
           "caption": "Prüft deine Etagen-/Raumnamen auf Konsistenz — rein beschreibend: die MEHRHEIT deiner bestehenden Namen bestimmt, was „die Konvention“ gerade ist, keine feste Vorgabe. Meldet z. B. eine uneinheitliche Zahlenposition oder Groß-/Kleinschreibung, doppelte oder sehr kurze/kryptische Namen. Häkchen setzen und „Ausgewählte übernehmen“ klicken benennt nur die ausgewählten Zeilen tatsächlich um — nichts geschieht automatisch."
         },
-        { "type": "Button", "caption": "🔍 Struktur prüfen", "onClick": "echo STRUKT_RunNamingCheck($id);" },
-        { "type": "Label", "name": "StandesamtStatus", "caption": "ℹ️ Noch nicht geprüft." },
+        { "type": "Button", "caption": "🔍 Struktur prüfen", "onClick": "echo RAUM_RunNamingCheck($id);" },
+        { "type": "Label", "name": "NamenspruefungStatus", "caption": "ℹ️ Noch nicht geprüft." },
         {
           "type": "List",
           "name": "NamingFindings",
@@ -284,7 +288,7 @@
             { "caption": "Objekt-ID", "name": "ObjectID", "width": "90px", "add": 0, "save": true }
           ]
         },
-        { "type": "Button", "caption": "✅ Ausgewählte übernehmen", "onClick": "echo STRUKT_ApplyNamingFixes($id, $NamingFindings);" }
+        { "type": "Button", "caption": "✅ Ausgewählte übernehmen", "onClick": "echo RAUM_ApplyNamingFixes($id, $NamingFindings);" }
       ]
     },
     {
@@ -292,9 +296,9 @@
       "name": "ForumHint",
       "visible": true,
       "items": [
-        { "type": "Label", "caption": "🧪 Katasteramt ist neu — Rückmeldungen sind im Symcon-Forum willkommen:" },
-        { "type": "Label", "link": true, "caption": "https://github.com/DG65/Toolkit-Katasteramt" },
-        { "type": "Button", "caption": "Nicht mehr anzeigen", "onClick": "STRUKT_DismissForumHint($id);" }
+        { "type": "Label", "caption": "🧪 Raumstruktur ist neu — Rückmeldungen sind im Symcon-Forum willkommen:" },
+        { "type": "Label", "link": true, "caption": "https://github.com/DG65/Raumstruktur" },
+        { "type": "Button", "caption": "Nicht mehr anzeigen", "onClick": "RAUM_DismissForumHint($id);" }
       ]
     }
   ],

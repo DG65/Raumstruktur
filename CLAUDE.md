@@ -1,24 +1,19 @@
 # Hinweise für die Arbeit an diesem Repository
 
-## Name: Katasteramt (DG65 Toolkit) — seit 09.09.2026 auch technisch
+## Name: Raumstruktur (DG65-Toolkit) — seit 13.10.2026 vollständig umbenannt
 
-Seit 08.09.2026 heißt dieses Modul im DG65 Toolkit **„Katasteramt"** (Anzeigename,
-`library.json→name` = „DG65 Toolkit Katasteramt", `module.json→aliases` enthält
-„StrukturHub" als Legacy-Alias). Seit 09.09.2026 ist „Katasteramt" auch der TECHNISCHE Name:
-PHP-Klasse `Katasteramt` (vormals `StrukturHub`), `module.json→name` entsprechend angepasst.
-Möglich gemacht durch Dietmars komplette Symcon-Neuinstallation (keine laufende Instanz mehr,
-die die Klassenumbenennung hätte brechen können — siehe TOOLKIT.md-Faustregel: technischer
-Name friert erst ein, sobald eine echte Instanz läuft oder ein Fremdmodul per
-`function_exists('STRUKT_...')` darauf zugreift).
+Dietmar (13.10.2026, siehe TOOLKIT.md „Umbenennung auf Funktionsnamen"): Toolkit-Module sollen
+sagen, was sie tun. Aus „Katasteramt" (davor „StrukturHub") wurde **„DG65-Toolkit Raumstruktur"**:
+PHP-Klasse + Modulordner `Raumstruktur`, `module.json→name` = `Raumstruktur`, Präfix **`RAUM`**
+(Funktionen `RAUM_GetStructure()` usw., vormals `STRUKT_`), Repo `DG65/Raumstruktur`
+(GitHub-Umbenennung, alter Name `Toolkit-Katasteramt` wird NIE wiederverwendet). **GUIDs von
+Bibliothek und Modul blieben**, damit Dietmars Instanz samt Eigenschaften erhalten bleibt; genau ein
+Alias = „DG65-Toolkit Raumstruktur". Sub-Funktionen heißen jetzt „Struktur anlegen" (vormals
+„Baumeister") und „Namensprüfung" (vormals „Standesamt"). Die Einfrier-Faustregel aus TOOLKIT.md
+gilt für den Namen NACH dieser Umbenennung unverändert.
 
-**Unverändert bleibt NUR der Funktions-Präfix `STRUKT_`** (und damit Repo-Name
-`Toolkit-Katasteramt`, GUIDs) — bewusst getrennt vom Klassennamen, weil `module.json→prefix`
-ein eigenständiges Feld ist. Grund: `STRUKT_GetStructure()` wird bereits von
-MeterHub/Dashboard/EMS in deren eigenem Code aufgerufen — eine PRÄFIX-Umbenennung würde das
-brechen, eine reine Klassenumbenennung dagegen nicht (IPS lädt die Klasse über
-`module.json→name`, nicht über den Präfix). Bei jeder künftigen Änderung diese Trennung
-beibehalten (Anzeigename ≠ technischer Präfix), analog zu „NRG-Stack EMS" (Anzeige) vs.
-Präfix `EMS_` (Technik) im restlichen Verbund.
+Vertrag: `RAUM_GetStructure()` mit identischem Rückgabeformat, contractVersion unverändert (nur der
+Präfix wanderte). Konsumenten stellen auf „RAUM_ zuerst, STRUKT_ als Rückfall" um.
 
 **Verbindliches Manifest für DG65 Toolkit:** `/Users/dietmar/Nextcloud/Claude/TOOLKIT.md`
 (analog zu SUITE.md bei NRG-Stack) — Branding-Faustregel, Branch-Strategie, Cross-Modul-
@@ -30,23 +25,23 @@ TOOLKIT.md selbst weiter auf SUITE.md.
 Teil desselben Modul-Verbunds (NRG-Stack, DG65), an mehreren wird teils gleichzeitig in
 getrennten Sitzungen gearbeitet:
 
-- **Katasteramt** (dieses Repo, vormals StrukturHub): Objektbaum-Struktur maschinenlesbar machen —
-  https://github.com/DG65/Toolkit-Katasteramt
+- **Raumstruktur** (dieses Repo, vormals Katasteramt/StrukturHub): Objektbaum-Struktur maschinenlesbar machen —
+  https://github.com/DG65/Toolkit-Raumstruktur
 - **EMS**: koordinierende Instanz, Verbund-Manifest (lokale SUITE.md, siehe unten) — https://github.com/DG65/NRGEMS
 - **MeterHub**: erster geplanter Konsument (Raumzähler-Assistent: kaskadierte virtuelle
-  Raumzähler gegen `STRUKT_GetStructure()`)
+  Raumzähler gegen `RAUM_GetStructure()`)
 - **NRGDashboard**: geplanter Konsument (Gruppierung nach Räumen/Etagen)
 
 ## Rolle und Grundregeln
 
-1. **Reine Auskunft, kein Regler.** Katasteramt liest die bestehende Struktur und publiziert
-   sie über `STRUKT_GetStructure`. v0.1 legt nichts an, ändert nichts — v0.2 (der Baumeister)
+1. **Reine Auskunft, kein Regler.** Raumstruktur liest die bestehende Struktur und publiziert
+   sie über `RAUM_GetStructure`. v0.1 legt nichts an, ändert nichts — v0.2 (die Strukturanlage)
    ist ein separater, späterer Schritt.
-2. **Eigenständigkeit.** Katasteramt setzt kein anderes Modul voraus und wird selbst von
+2. **Eigenständigkeit.** Raumstruktur setzt kein anderes Modul voraus und wird selbst von
    keinem vorausgesetzt — jeder Fremdaufruf (sollte in v0.2+ nötig werden) hinter
    `function_exists()`. Prüfwerkzeug: `.tools/check-standalone.php`.
 3. **Vertrag ist öffentliche API.** Einmal veröffentlichte Feldnamen in
-   `STRUKT_GetStructure()` werden nie umbenannt, nur additiv erweitert (Minor hoch), Bruch
+   `RAUM_GetStructure()` werden nie umbenannt, nur additiv erweitert (Minor hoch), Bruch
    nur mit Major + Ankündigung.
 4. **Rückgabe ist ein JSON-STRING, kein Array** — genau an dieser Stelle sind Dashboard und
    ChargerHub beim MeterHub-Vertrag schon je einmal gestolpert (`is_array()` auf einem String
@@ -91,18 +86,18 @@ nachlesen, nicht Code zwischen Modulen vergleichen.
 ## Roadmap
 
 - **v0.1:** Read-only-Auskunft über bestehende Struktur. Live an Dietmars Anlage verifiziert.
-- **v0.4 (aktuell):** das Standesamt — Namenskonventions-Berater (`RunNamingCheck`/
-  `ApplyNamingFixes`/`analyzeNamingConventions` in `module.php`, Panel „🏛️ Standesamt"). Rein
+- **v0.4 (aktuell):** die Namensprüfung — Namenskonventions-Berater (`RunNamingCheck`/
+  `ApplyNamingFixes`/`analyzeNamingConventions` in `module.php`, Panel „🏛️ Namensprüfung"). Rein
   DESKRIPTIV (Mehrheit der eigenen Namen = Konvention, siehe "keine eigene Anlage als Norm"),
   vier Prüfungen (Zahlenposition/Case/Duplikate/Kurzlabel), Umbenennen nur für vom Nutzer
   angehakte Zeilen. Dabei nebenbei einen echten Bug gefunden+gefixt: `injectPreview()` (und
-  jetzt auch der neue `injectStandesamtValues()`) durchsuchten/durchsuchen das Formular
+  jetzt auch der neue `injectNamensprüfungValues()`) durchsuchten/durchsuchen das Formular
   rekursiv (`findFormElementByName()`), weil `StructurePreview` in einem `ExpansionPanel`
   verschachtelt liegt — die alte, rein flache Suche fand es beim ERSTEN Formularöffnen nie,
   nur nachträglich per `UpdateFormField()` nach einem Button-Klick.
-- **v0.2:** der Baumeister — legt Etagen-/Raum-Kategorien nach Konvention an
+- **v0.2:** die Strukturanlage — legt Etagen-/Raum-Kategorien nach Konvention an
   (`AddLevelRows`/`AddRoomRows`/`PreviewSkeleton`/`BuildSkeleton` in `module.php`, Panel
-  „🏗️ Baumeister" im Formular). Profitiert vom in v0.1 etablierten Vertrag (das
+  „🏗️ Strukturanlage" im Formular). Profitiert vom in v0.1 etablierten Vertrag (das
   Erzeugte ist per Definition vertragskonform — v0.1 liest die neuen Kategorien ohne Änderung
   korrekt ein).
 
@@ -126,10 +121,10 @@ nachlesen, nicht Code zwischen Modulen vergleichen.
     Dietmars Ergänzung — Geschoss-/Raumnummern können vor ODER nach dem Namen stehen, und
     Geräte-Nummern (Schalter/Steckdosen) leiten sich mitunter aus der Raumnummer ab, die
     wiederum aus der Geschossnummer abgeleitet sein kann. Umgesetzt: Generator-Massenhilfe hat
-    ein Nummer-Position-Feld (vorne/hinten); `STRUKT_GetStructure()` liefert seit
+    ein Nummer-Position-Feld (vorne/hinten); `RAUM_GetStructure()` liefert seit
     `contractVersion` 1.1 ein zusätzliches, heuristisch aus dem Namen abgeleitetes `number`-Feld
     (levels UND rooms, siehe `extractNumber()`) — funktioniert für JEDE Kategorie, nicht nur
-    generator-erzeugte. Geräte-Nummern selbst bleiben außerhalb des Scopes (Katasteramt legt
+    generator-erzeugte. Geräte-Nummern selbst bleiben außerhalb des Scopes (Raumstruktur legt
     keine Geräte an); Konsumenten, die Geräte benennen, können `number` dafür nutzen.
 
   **Bewusst nicht in v0.2 enthalten** (siehe Plan-Datei für die Begründung): keine

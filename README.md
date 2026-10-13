@@ -1,53 +1,52 @@
-# Katasteramt
+# Raumstruktur
 
 ![Symcon](https://img.shields.io/badge/Symcon-PHPModul-blue)
-![Modul Version](https://img.shields.io/badge/Modul_Version-0.4.2-blue)
+![Modul Version](https://img.shields.io/badge/Modul_Version-0.5.0-blue)
 ![Symcon Version](https://img.shields.io/badge/Symcon_Version-9.0%2B-blue)
 ![License](https://img.shields.io/badge/License-PolyForm_Noncommercial_1.0.0-lightgrey)
-![Check Style](https://github.com/DG65/Toolkit-Katasteramt/actions/workflows/check-style.yml/badge.svg)
+![Check Style](https://github.com/DG65/Raumstruktur/actions/workflows/check-style.yml/badge.svg)
 [![PayPal](https://img.shields.io/badge/PayPal-Me-blue?logo=paypal)](https://paypal.me/DietmarGureth)
 
-**Name im DG65 Toolkit: Katasteramt** — die Behörde, die amtlich festhält, wie ein
-Grundstück in Parzellen aufgeteilt ist. Seit 09.09.2026 auch technisch der Name (PHP-Klasse
-`Katasteramt`, vormals `StrukturHub`) — möglich gemacht durch eine komplette
-Symcon-Neuinstallation bei Dietmar (keine laufende Instanz mehr, die durch eine Klassen-
-umbenennung hätte brechen können). Der Funktions-**Präfix `STRUKT_` bleibt bewusst
-unverändert**, unabhängig vom Klassennamen (beides sind in `module.json` getrennte Felder) —
-der Vertrag `STRUKT_GetStructure()` wird von MeterHub, Dashboard und EMS konsumiert, eine
-Präfix-Änderung würde deren Code brechen, eine reine Klassenumbenennung dagegen nicht.
+**DG65-Toolkit Raumstruktur** — Etagen und Räume des Objektbaums maschinenlesbar machen und
+bei Bedarf als Kategorie-Gerüst anlegen. Das Modul hieß bis 13.10.2026 „Katasteramt“
+(davor „StrukturHub“) und wurde auf seinen Funktionsnamen umbenannt: PHP-Klasse und
+Modulordner `Raumstruktur`, Funktions-Präfix **`RAUM_`** (vormals `STRUKT_`), Repo
+`DG65/Raumstruktur`. Die GUIDs von Bibliothek und Modul blieben gleich, bestehende Instanzen
+samt Eigenschaften bleiben beim Umstieg erhalten. Der Vertrag `RAUM_GetStructure()` hat
+dasselbe Rückgabeformat wie früher `STRUKT_GetStructure()`.
 
 IP-Symcon bietet keinen Konfigurationsrahmen für den Objektbaum — jede Installation
 strukturiert Räume/Etagen/Geräte anders, und andere Module können Geräte deshalb nicht
-zuverlässig eingruppieren. **Katasteramt** macht eine bestehende Objektbaum-Struktur
+zuverlässig eingruppieren. **Raumstruktur** macht eine bestehende Objektbaum-Struktur
 maschinenlesbar, damit Partnermodule (Raumzähler-Zuordnung, Dashboard-Gruppierung,
 Lastmanagement-Eingruppierung, …) sie automatisch abfragen können, statt jeweils eigene
 Heuristiken zu bauen.
 
-## Drei Funktionen in fester Reihenfolge
+## Drei Funktionen
 
 - **v0.1 — Auskunft über Bestehendes, read-only.** Der Nutzer zeigt einmal im Formular, wo
   seine Struktur liegt (Wurzelkategorie der Räume, welche Unterkategorien Etagen sind).
-  Katasteramt liefert das als Vertrag. Legt nichts an, baut nichts um — gefahrlos
+  Raumstruktur liefert das als Vertrag. Legt nichts an, baut nichts um — gefahrlos
   installierbar.
-- **v0.2 (dieses Release) — der Baumeister.** Legt Etagen-/Raum-Kategorien nach der
-  Verbund-Konvention an — Panel „🏗️ Baumeister" im Formular. Alle Begriffe frei
+- **v0.2 — Struktur anlegen.** Legt Etagen-/Raum-Kategorien nach der
+  Verbund-Konvention an — Panel „🏗️ Struktur anlegen" im Formular. Alle Begriffe frei
   wählbar (Etage/Stockwerk/Geschoss, Raum/Büro/Zimmer), per Präfix+Nummernbereich auch in
   Masse (privat wie gewerblich), Nummer wahlweise vor oder nach dem Namen ("101 Büro" /
   "Büro 101"). Legt ausschließlich Kategorien an — **keine** Geräte-Instanzen/Links (die
   verknüpft man wie gewohnt selbst). Idempotent: mehrfaches Anlegen mit denselben Zeilen
   erzeugt keine Duplikate. Baut auf dem v0.1-Vertrag auf (das Erzeugte liest v0.1 automatisch
   korrekt ein, inklusive der daraus ableitbaren Raumnummer, siehe `number`-Feld unten).
-- **v0.4 (dieses Release) — das Standesamt.** Prüft Etagen-/Raumnamen auf Konsistenz — Panel
-  „🏛️ Standesamt" im Formular. Rein **beschreibend**: die Mehrheit deiner eigenen Namen
+- **v0.4 — die Namensprüfung.** Prüft Etagen-/Raumnamen auf Konsistenz — Panel
+  „🏛️ Namensprüfung" im Formular. Rein **beschreibend**: die Mehrheit deiner eigenen Namen
   bestimmt, was „die Konvention" gerade ist, nichts wird fest vorgegeben (keine eigene Anlage
   als Norm). Prüft Zahlenposition, Groß-/Kleinschreibung, doppelte und sehr kurze/kryptische
   Namen. Zeigt Korrekturvorschläge, benennt aber **nur** die vom Nutzer angehakten Zeilen
   tatsächlich um (`IPS_SetName()`) — nichts geschieht automatisch.
 
-## Vertrag `STRUKT_GetStructure($id): string`
+## Vertrag `RAUM_GetStructure($id): string`
 
 Rückgabe ist ein **JSON-STRING** (kein PHP-Array) — beim Aufrufer
-`json_decode(STRUKT_GetStructure($id), true)` verwenden.
+`json_decode(RAUM_GetStructure($id), true)` verwenden.
 
 ```json
 {
@@ -94,24 +93,24 @@ Rückgabe ist ein **JSON-STRING** (kein PHP-Array) — beim Aufrufer
   Best-Effort-Ableitung** einer Geschoss-/Raumnummer aus dem Namen — die Zahl darf vor oder
   nach dem Namen stehen ("101 Küche"/"Küche 101"), mit oder ohne Trenner. **String, nicht
   Zahl** (führende Nullen bleiben erhalten), `null` wenn keine Nummer erkennbar. Funktioniert
-  für jede Kategorie, nicht nur über den Baumeister erzeugte — gedacht z. B. für
+  für jede Kategorie, nicht nur über den Struktur anlegen erzeugte — gedacht z. B. für
   Konsumenten, die Geräte-Idents aus der Raumnummer ableiten wollen.
 - `structureChangedAt` ändert sich **nur**, wenn sich `levels`/`rooms` inhaltlich seit dem
   letzten Aufruf tatsächlich geändert haben (interner Hash-Vergleich) — Konsumenten können
   diesen einen Wert pollen/vergleichen, statt das komplette JSON zu diffen. Es gibt **keinen**
   Push-Mechanismus (kein Event/keine Nachricht bei Änderung).
-- `instanceID` ist die ID dieser Katasteramt-Instanz (Debugging/Logging).
-- Immer hinter `function_exists('STRUKT_GetStructure')` aufrufen — jedes Partnermodul ist
-  optional, ohne Katasteramt installiert bleibt jedes andere Modul unverändert funktionsfähig.
+- `instanceID` ist die ID dieser Raumstruktur-Instanz (Debugging/Logging).
+- Immer hinter `function_exists('RAUM_GetStructure')` aufrufen — jedes Partnermodul ist
+  optional, ohne Raumstruktur installiert bleibt jedes andere Modul unverändert funktionsfähig.
 
 ## Mehrere Instanzen
 
-Mehrere Katasteramt-Instanzen sind ausdrücklich zulässig (z. B. Haupthaus + Nebengebäude mit
+Mehrere Raumstruktur-Instanzen sind ausdrücklich zulässig (z. B. Haupthaus + Nebengebäude mit
 getrennter Wurzelkategorie) — **keine Singleton-Annahme**. Konsumenten iterieren über ALLE
 Instanzen von `IPS_GetInstanceListByModuleID('{CA700334-0982-F356-0617-6952868137E9}')`, nicht
 nur die erste gefundene.
 
-## Was Katasteramt NICHT tut (v0.1)
+## Was Raumstruktur NICHT tut (v0.1)
 
 Keine automatische Etagen-Erkennung — auf derselben Ebene wie Etagen können auch
 Gewerke-Kategorien liegen (Energie, Heizung, Test, …), das lässt sich nicht zuverlässig
@@ -128,5 +127,5 @@ Teil des **DG65 Toolkit** — eigenständige, domänenfreie Symcon-Bausteine von
 Energiebezug. Geschwister-Module (Stand 08.09.2026): **Destille**
 ([GleitenderMittelwert](https://github.com/DG65/NRGGleitenderMittelwert)), **Pförtner**
 ([Tueroeffner](https://github.com/DG65/Pfoertner)), **Vormund** (MigrationsHub). Kein
-NRG-Stack-Modul, auch wenn erste Konsumenten des `STRUKT_GetStructure()`-Vertrags (MeterHub,
+NRG-Stack-Modul, auch wenn erste Konsumenten des `RAUM_GetStructure()`-Vertrags (MeterHub,
 Dashboard, EMS) aus NRG-Stack kommen — das ist Reihenfolge, keine fachliche Zugehörigkeit.

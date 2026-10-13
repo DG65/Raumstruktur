@@ -1,23 +1,23 @@
 <?php
 
 // ===========================================================================
-// Katasteramt (PHP-Klasse seit 09.09.2026 "Katasteramt", vormals "StrukturHub"
-// — Präfix STRUKT_ bleibt unverändert, siehe CLAUDE.md) — macht die
+// Raumstruktur (PHP-Klasse seit 13.10.2026 "Raumstruktur", zuvor "Katasteramt",
+// davor "StrukturHub"; Präfix seit 13.10.2026 RAUM_, zuvor STRUKT_) — macht die
 // BESTEHENDE Objektbaum-Struktur einer IP-Symcon-Installation (Etagen →
-// Räume → Geräte-Instanzen) maschinenlesbar, damit andere NRG-Stack-Module
-// Geräte zuverlässig eingruppieren können, ohne jedes Mal selbst zu raten
+// Räume → Geräte-Instanzen) maschinenlesbar, damit andere Module Geräte
+// zuverlässig eingruppieren können, ohne jedes Mal selbst zu raten
 // ("jedesmal anders Chaos", Auftraggeber-Zitat).
 //
 // STATUS v0.1: reines Auskunfts-Modul (read-only). Legt nichts an, baut
 // nichts um — der Nutzer zeigt einmal im Formular, wo seine Struktur liegt,
-// Katasteramt liefert das als Vertrag (STRUKT_GetStructure). Der Gerüst-
+// Raumstruktur liefert das als Vertrag (RAUM_GetStructure). Der Gerüst-
 // Generator (v0.2, Kategorien+Links anlegen) baut später darauf auf.
 //
-// Kein Modul im Verbund wird vorausgesetzt — Katasteramt hat keine
+// Kein Modul im Verbund wird vorausgesetzt — Raumstruktur hat keine
 // Partnermodul-Abhängigkeit und funktioniert komplett eigenständig.
 // ===========================================================================
 
-class Katasteramt extends IPSModule
+class Raumstruktur extends IPSModule
 {
     public function Create()
     {
@@ -36,7 +36,7 @@ class Katasteramt extends IPSModule
         // SUITE.md Store-Review Punkt 3) + IsLevel (die eigentliche Eingabe).
         $this->RegisterPropertyString('Levels', '[]');
 
-        // v0.2 Baumeister: Eingabe-/Planungszustand für Etagen/Räume,
+        // v0.2 Strukturanlage: Eingabe-/Planungszustand für Etagen/Räume,
         // die noch angelegt werden sollen (kein Lesevertrag, keine
         // Stabilitätsgarantie wie beim key in buildStructure() nötig).
         $this->RegisterPropertyString('GenLevels', '[]'); // [{Label:string}]
@@ -82,10 +82,10 @@ class Katasteramt extends IPSModule
     // -----------------------------------------------------------------
 
     /**
-     * STRUKT_GetStructure($id): string
+     * RAUM_GetStructure($id): string
      *
      * WICHTIG: Die Rückgabe ist ein JSON-STRING, kein PHP-Array (Verbund-
-     * Konvention) — beim Konsumenten json_decode(STRUKT_GetStructure($id), true)
+     * Konvention) — beim Konsumenten json_decode(RAUM_GetStructure($id), true)
      * aufrufen, niemals is_array() direkt auf das Ergebnis prüfen.
      *
      * {
@@ -101,7 +101,7 @@ class Katasteramt extends IPSModule
      * - "levels" ist leer, wenn keine Etagen-Ebene bestätigt wurde — "rooms[].level"
      *   ist dann ebenfalls "" (Räume liegen direkt unter der Wurzelkategorie).
      *   Existieren Etagen, kann "rooms[].level" TROTZDEM "" sein für Räume, die
-     *   der v0.2-Baumeister bewusst ohne Etagen-Zuordnung direkt unter
+     *   die v0.2-Strukturanlage bewusst ohne Etagen-Zuordnung direkt unter
      *   der Wurzel angelegt hat (gemischte Struktur) — erkennbar am
      *   generator-eigenen Ident-Präfix, nicht jede unflagged Kategorie wird
      *   automatisch zum Raum (sonst kämen Gewerke-Kategorien wieder rein).
@@ -134,18 +134,18 @@ class Katasteramt extends IPSModule
      *   Namen (siehe extractNumber()) — Zahl kann vor ODER nach dem Namen
      *   stehen ("101 Küche"/"Küche 101"), mit/ohne Trenner. String, nicht
      *   int (führende Nullen bleiben erhalten), "null" wenn keine Nummer
-     *   erkennbar. Funktioniert für JEDE Kategorie, nicht nur über den
-     *   Baumeister erzeugte. Kein Fachwert — z. B. für Konsumenten
+     *   erkennbar. Funktioniert für JEDE Kategorie, nicht nur über die
+     *   Strukturanlage erzeugte. Kein Fachwert — z. B. für Konsumenten
      *   gedacht, die Geräte-Idents aus der Raumnummer ableiten wollen.
      * - "structureChangedAt" (Unix-Zeitstempel) ändert sich NUR, wenn sich
      *   levels/rooms inhaltlich seit dem letzten Aufruf tatsächlich geändert
      *   haben (Hash-Vergleich intern) — Konsumenten können das als billigen
      *   Änderungs-Check pollen, statt das komplette JSON zu diffen. Es gibt
      *   KEINEN Push-Mechanismus (kein Event/keine Nachricht bei Änderung).
-     * - "instanceID" ist die ID dieser Katasteramt-Instanz (Debugging/Logging).
+     * - "instanceID" ist die ID dieser Raumstruktur-Instanz (Debugging/Logging).
      * - Ohne konfigurierte Wurzelkategorie liefert dies leere levels/rooms-Arrays
      *   und "structureChangedAt": 0, kein Fehler.
-     * - MEHRERE Katasteramt-Instanzen sind ausdrücklich zulässig (z. B. Haupthaus
+     * - MEHRERE Raumstruktur-Instanzen sind ausdrücklich zulässig (z. B. Haupthaus
      *   + Nebengebäude mit getrennter Wurzelkategorie) — KEINE Singleton-Annahme.
      *   Konsumenten iterieren über ALLE Instanzen von
      *   IPS_GetInstanceListByModuleID('{CA700334-0982-F356-0617-6952868137E9}'),
@@ -203,7 +203,7 @@ class Katasteramt extends IPSModule
     }
 
     // -----------------------------------------------------------------
-    // v0.2 Baumeister — legt NUR Kategorien an (Etagen/Räume), keine
+    // v0.2 Strukturanlage — legt NUR Kategorien an (Etagen/Räume), keine
     // Geräte-Instanzen/Links. Massen-Hilfe-Felder (Präfix/Start/Ende) haben
     // bewusst keine eigene Property, sondern werden als Formularfeld-Namen
     // direkt an den Button übergeben (Muster MeterHub VirtualPartners/
@@ -518,7 +518,7 @@ class Katasteramt extends IPSModule
             // List-Feld direkt per Formularfeld-Namen referenziert
             // (z. B. "$GenLevels" im onClick) — der IPS-Kernel übergibt dann
             // ein IPSList-Objekt statt eines JSON-Strings, siehe Kommentar
-            // oberhalb der Baumeister-Methoden.
+            // oberhalb der Strukturanlage-Methoden.
             $out = [];
             foreach ($rows as $row) {
                 $out[] = is_array($row) ? $row : (array) $row;
@@ -543,7 +543,7 @@ class Katasteramt extends IPSModule
         $this->injectLevelsValues($form);
         $this->injectStatusLine($form);
         $this->injectPreview($form);
-        $this->injectStandesamtValues($form);
+        $this->injectNamenspruefungValues($form);
 
         return json_encode($form);
     }
@@ -576,8 +576,8 @@ class Katasteramt extends IPSModule
     {
         $lib    = @IPS_GetLibrary('{5E0A988D-0222-B254-88BE-61112640BBD5}');
         $verTxt = (is_array($lib) && isset($lib['Version']))
-            ? 'ℹ️ Katasteramt Version ' . $lib['Version'] . ' (Build ' . ($lib['Build'] ?? '?') . ')'
-            : 'ℹ️ Katasteramt';
+            ? 'ℹ️ Raumstruktur Version ' . $lib['Version'] . ' (Build ' . ($lib['Build'] ?? '?') . ')'
+            : 'ℹ️ Raumstruktur';
         foreach ($form['elements'] as &$el) {
             if (($el['type'] ?? '') === 'ExpansionPanel' && str_contains($el['caption'] ?? '', 'Dokumentation')) {
                 array_unshift($el['items'], ['type' => 'Label', 'caption' => $verTxt]);
@@ -591,7 +591,7 @@ class Katasteramt extends IPSModule
     // Name/Anzahl-Spalten aber immer frisch anzeigen (Store-Review Punkt 3 —
     // berechnete Anzeigespalten nie aus der Konfiguration nachladen).
     // $forceLevelIDs erzwingt IsLevel=true für bestimmte categoryIDs, unabhängig
-    // von der gespeicherten Auswahl — genutzt vom v0.2-Baumeister, um
+    // von der gespeicherten Auswahl — genutzt von der v0.2-Strukturanlage, um
     // frisch angelegte Etagen-Kategorien direkt vorzuhäkeln.
     private function buildLevelsRows(array $forceLevelIDs = []): array
     {
@@ -641,13 +641,13 @@ class Katasteramt extends IPSModule
         }
     }
 
-    private function injectStandesamtValues(array &$form): void
+    private function injectNamenspruefungValues(array &$form): void
     {
         $findings = $this->analyzeNamingConventions();
 
-        $status = &$this->findFormElementByName($form['elements'], 'StandesamtStatus');
+        $status = &$this->findFormElementByName($form['elements'], 'NamenspruefungStatus');
         if ($status !== null) {
-            $status['caption'] = $this->standesamtStatusText($findings);
+            $status['caption'] = $this->namenspruefungStatusText($findings);
         }
 
         $list = &$this->findFormElementByName($form['elements'], 'NamingFindings');
@@ -663,7 +663,7 @@ class Katasteramt extends IPSModule
     // nachträglich über UpdateFormField() bei einem Button-Klick, der die
     // Verschachtelung ignoriert). Seit 28.09.2026 nutzen alle Injektoren
     // (injectLevelsValues/injectStatusLine/injectPreview/
-    // injectStandesamtValues) diese Funktion, damit eine spätere
+    // injectNamenspruefungValues) diese Funktion, damit eine spätere
     // Formular-Umstrukturierung nicht wieder eine nur oberste Ebene
     // durchsuchende Injektion stillschweigend kaputt macht. Gibt eine
     // Referenz zurück, damit der Aufrufer das Element direkt verändern kann;
@@ -789,7 +789,7 @@ class Katasteramt extends IPSModule
                 }
             }
 
-            // Räume, die der v0.2-Baumeister BEWUSST ohne Etagen-
+            // Räume, die die v0.2-Strukturanlage BEWUSST ohne Etagen-
             // Zuordnung direkt unter der Wurzel angelegt hat (auch wenn
             // andere Räume derselben Struktur Etagen haben) — Live-Fund
             // 29.08.2026: wurden bislang komplett übersehen, weil dieser
@@ -1008,7 +1008,7 @@ class Katasteramt extends IPSModule
     }
 
     // -----------------------------------------------------------------
-    // v0.4 Standesamt — Namenskonventions-Berater. Rein DESKRIPTIV: die
+    // v0.4 Namensprüfung — Namenskonventions-Berater. Rein DESKRIPTIV: die
     // MEHRHEIT der bestehenden Namen bestimmt "die Konvention", nichts wird
     // fest codiert vorgegeben (SUITE.md-Grundregel "keine eigene Anlage als
     // Norm" — jede Installation hat andere Vorlieben). Arbeitet direkt auf
@@ -1020,8 +1020,8 @@ class Katasteramt extends IPSModule
     public function RunNamingCheck(): string
     {
         $findings = $this->analyzeNamingConventions();
-        $status   = $this->standesamtStatusText($findings);
-        $this->UpdateFormField('StandesamtStatus', 'caption', $status);
+        $status   = $this->namenspruefungStatusText($findings);
+        $this->UpdateFormField('NamenspruefungStatus', 'caption', $status);
         $this->UpdateFormField('NamingFindings', 'values', json_encode($this->namingFindingRows($findings), JSON_UNESCAPED_UNICODE));
         return $status;
     }
@@ -1049,7 +1049,7 @@ class Katasteramt extends IPSModule
         // Nach Änderungen frisch neu analysieren — behobene Funde
         // verschwinden, sonst zeigt die Liste den jetzt falschen Altstand.
         $fresh = $this->analyzeNamingConventions();
-        $this->UpdateFormField('StandesamtStatus', 'caption', $this->standesamtStatusText($fresh));
+        $this->UpdateFormField('NamenspruefungStatus', 'caption', $this->namenspruefungStatusText($fresh));
         $this->UpdateFormField('NamingFindings', 'values', json_encode($this->namingFindingRows($fresh), JSON_UNESCAPED_UNICODE));
 
         if ($applied === 0) {
@@ -1260,7 +1260,7 @@ class Katasteramt extends IPSModule
         return $rows;
     }
 
-    private function standesamtStatusText(array $findings): string
+    private function namenspruefungStatusText(array $findings): string
     {
         if (empty($findings)) {
             return '✅ Keine Auffälligkeiten gefunden.';
@@ -1357,7 +1357,7 @@ class Katasteramt extends IPSModule
 
     // Deutscher Slug (Umlaute umschreiben, Rest auf [a-z0-9] reduzieren) —
     // genutzt für den v0.1-Lesevertrag-Key (uniqueKey()) UND für die v0.2-
-    // Baumeister-Idents (planSkeleton()).
+    // Strukturanlage-Idents (planSkeleton()).
     private function slugify(string $label, string $fallback): string
     {
         $slug = strtr(mb_strtolower($label), ['ä' => 'ae', 'ö' => 'oe', 'ü' => 'ue', 'ß' => 'ss']);

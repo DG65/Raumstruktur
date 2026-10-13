@@ -3,6 +3,28 @@
 Alle nennenswerten Änderungen an diesem Modul werden hier dokumentiert.
 Format angelehnt an [Keep a Changelog](https://keepachangelog.com/de/1.0.0/).
 
+## [0.5.0] - 2026-10-13
+
+### Changed
+- **Vollständige Umbenennung auf den Funktionsnamen „Raumstruktur"** (TOOLKIT.md, Abschnitt
+  „Umbenennung auf Funktionsnamen", Dietmar 13.10.2026): PHP-Klasse und Modulordner
+  `Raumstruktur` (vormals `Katasteramt`), Funktions-Präfix **`RAUM_`** (vormals `STRUKT_`),
+  Repo `DG65/Raumstruktur` (vormals `DG65/Toolkit-Katasteramt`), Anzeigename „DG65-Toolkit
+  Raumstruktur". **Die GUIDs von Bibliothek und Modul bleiben**, bestehende Instanzen hängen sich
+  beim Neuregistrieren wieder an. Genau ein Alias.
+- **Vertrag:** `RAUM_GetStructure()` (und alle weiteren Funktionen) mit unverändertem
+  Rückgabeformat, `contractVersion` bleibt 1.1 — nur der Präfix wandert. Aufrufer: neuen Präfix
+  zuerst prüfen (`function_exists('RAUM_GetStructure')`), `STRUKT_` nur als Rückfall.
+- Bereiche im Formular umbenannt: „Baumeister" → „Struktur anlegen", „Standesamt" →
+  „Namensprüfung" (Behörden-/Personenbilder entfallen). Interne Element-Name
+  `StandesamtStatus` → `NamenspruefungStatus`.
+- Hinweis zum Umstieg: Beim Neuregistrieren (Modul entfernen, neue Repo-URL hinzufügen) gehen
+  **Attribute** verloren — hier betrifft das die ausgeblendeten Hinweise (News/Forum), den
+  Zeitstempel/Hash der Änderungserkennung (`structureChangedAt` beginnt neu) und die
+  Key-Zuordnung je Kategorie (`key` wird beim nächsten Einlesen aus den dann aktuellen Namen
+  neu vergeben — bei seit dem ersten Erfassen umbenannten Kategorien kann sich ein `key`
+  ändern). Eigenschaften (Wurzelkategorie, Etagen-Häkchen) bleiben erhalten.
+
 ## [0.4.2] - 2026-09-09
 
 ### Added

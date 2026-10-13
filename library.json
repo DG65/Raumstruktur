@@ -1,12 +1,12 @@
 {
   "id": "{5E0A988D-0222-B254-88BE-61112640BBD5}",
   "author": "DG65",
-  "name": "DG65 Toolkit Katasteramt",
-  "url": "https://github.com/DG65/Toolkit-Katasteramt",
+  "name": "DG65-Toolkit Raumstruktur",
+  "url": "https://github.com/DG65/Raumstruktur",
   "compatibility": {
     "version": "9.0"
   },
-  "version": "0.4.2",
-  "build": 27,
-  "date": 1788893400
+  "version": "0.5.0",
+  "build": 28,
+  "date": 1791894000
 }
